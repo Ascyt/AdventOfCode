@@ -56,12 +56,41 @@
     public static void WriteLineColor(string arg, ConsoleColor color) =>
         WriteColor(arg + '\n', color);
 
-    public static void PrintStep(string line, int result)
+    public struct Variable
+    {
+        public string name;
+        public string value;
+
+        public Variable(string name, string value)
+        {
+            this.name = name;
+            this.value = value;
+        }
+        public Variable(string name, int value)
+        {
+            this.name = name;
+            this.value = value.ToString();
+        }
+    }
+    private static Variable Var(string name, string value)
+        => new Variable(name, value);
+    private static Variable Var(string name, int value)
+        => new Variable(name, value);
+
+    public static void PrintStep(string line, int result, params Variable[] variables)
     {
         int delta = result - lastStep;
         lastStep = result;
-        stepOutput += $"\"{line}\": {result} [{(delta > 0 ? "+" : "")}{delta}]\n";
+        stepOutput += $"\"{line}\": {result} [{(delta > 0 ? "+" : "")}{delta}]";
+
+        foreach (Variable variable in variables)
+        {
+            stepOutput += $" | {variable.name}: {variable.value}";
+        }
+
+        stepOutput += "\n";
     }
+
 
     private static int d2v2(string[] input)
     {
@@ -75,7 +104,7 @@
                 (opponent + 1) % 3 == player % 3 ? 6 : 0)
                 + player + 1;
 
-            PrintStep(line, total);
+            PrintStep(line, total, Var(nameof(opponent), opponent), Var(nameof(player), player));
         }
         return total;
     }
@@ -92,7 +121,7 @@
                 (opponent + 1) % 3 == player % 3 ? 6 : 0)
                 + player + 1;
 
-            PrintStep(line, total);
+            PrintStep(line, total, Var(nameof(opponent), opponent), Var(nameof(player), player));
         }
         return total;
     }
