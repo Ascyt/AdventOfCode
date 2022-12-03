@@ -1,8 +1,8 @@
 ﻿class Program
 {
-    const string INPUT_FILE = @"C:\Users\FamZauner\Downloads\input";
+    const string INPUT_FILE = @"C:\Users\filip\Downloads\input";
     const bool ASK_FOR_INPUT = false;
-    static Method ToRun = d2v2;
+    static Method ToRun = d3v2;
 
 
     delegate int Method(string[] input);
@@ -92,6 +92,71 @@
     }
 
 
+    private static int d3v2(string[] input)
+    {
+        int total = 0;
+
+        List<char>? commonItems = null;
+
+        for (int i = 0; i < input.Length; i++)
+        {
+            if (i % 3 == 0)
+            {
+                CheckCommons();
+            }
+
+            string line = input[i];
+
+            List<char> newCommonItems = new List<char>();
+
+            for (int ii = 0; ii < line.Length; ii++)
+            {
+                if (commonItems == null || commonItems.Contains(line[ii]))
+                {
+                    newCommonItems.Add(line[ii]);
+                }
+            }
+
+            commonItems = newCommonItems.ToArray().ToList();
+        }
+
+        CheckCommons();
+
+        return total;
+
+        void CheckCommons()
+        {
+            if (commonItems != null)
+            {
+                total += commonItems[0] >= 'a' && commonItems[0] <= 'z' ? (commonItems[0] - 'a' + 1) : (commonItems[0] - 'A' + 27);
+                PrintStep("?", total, Var("commonItems[0]", commonItems[0]));
+            }
+            commonItems = null;
+        }
+    }
+    private static int d3v1(string[] input)
+    {
+        int total = 0;
+
+        foreach (string line in input)
+        {
+            bool exit = false;
+            for (int i = 0; i < line.Length / 2 && !exit; i++)
+            {
+                for (int ii = line.Length / 2; ii < line.Length && !exit; ii++)
+                {
+                    if (line[i] == line[ii])
+                    {
+                        total += line[i] >= 'a' && line[i] <= 'z' ? (line[i] - 'a' + 1) : (line[i] - 'A' + 27);
+                        exit = true;
+                        PrintStep(line, total, Var("line[i]", line[i]), Var("line[ii]", line[ii]));
+                    }
+                }
+            }
+        }
+
+        return total;
+    }
     private static int d2v2(string[] input)
     {
         int total = 0;
