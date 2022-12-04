@@ -1,15 +1,17 @@
-﻿class Program
+﻿using System.Windows.Forms;
+
+class Program
 {
     const string INPUT_FILE = @"C:\Users\filip\Downloads\input";
     const bool ASK_FOR_INPUT = false;
-    static Method ToRun = d3v2;
+    static Method ToRun = d4v2;
 
 
     delegate int Method(string[] input);
 
-    private static string stepOutput = "";
     private static int lastStep;
 
+    [STAThread]
     public static void Main()
     {
         int? output = null;
@@ -34,7 +36,7 @@
                 args.RemoveAt(args.Count - 1);
             }
 
-            string[] input = ASK_FOR_INPUT ? args.ToArray() : File.ReadAllLines(INPUT_FILE);
+            string[] input = ASK_FOR_INPUT ? args.ToArray() : System.IO.File.ReadAllLines(INPUT_FILE);
 
             output = ToRun(input);
         }
@@ -43,18 +45,26 @@
             WriteLineColor(ex.ToString(), ConsoleColor.Red);
         }
 
-        WriteColor(stepOutput, ConsoleColor.DarkGray);
-        WriteLineColor(output == null ? "[no result]" : output.ToString(), ConsoleColor.Cyan);
+        WriteColor("\nResult: ", ConsoleColor.Black, ConsoleColor.White);
+
+        string outputString = output == null ? "[no result]" : output.ToString();
+
+        WriteColor(outputString, ConsoleColor.Black, ConsoleColor.Yellow);
+        WriteLineColor("", ConsoleColor.White);
+
+        Clipboard.SetText(outputString);
+        Console.WriteLine("Result copied to clipboard.");
     }
 
-    public static void WriteColor(string arg, ConsoleColor color)
+    public static void WriteColor(string arg, ConsoleColor foregroundColor, ConsoleColor backgroundColor = ConsoleColor.Black)
     {
-        Console.ForegroundColor = color;
+        Console.ForegroundColor = foregroundColor;
+        Console.BackgroundColor = backgroundColor;
         Console.Write(arg);
         Console.ResetColor();
     }
-    public static void WriteLineColor(string arg, ConsoleColor color) =>
-        WriteColor(arg + '\n', color);
+    public static void WriteLineColor(string arg, ConsoleColor foregroundColor, ConsoleColor backgroundColor = ConsoleColor.Black) =>
+        WriteColor(arg + '\n', foregroundColor, backgroundColor);
 
     public struct Variable
     {
@@ -81,17 +91,67 @@
     {
         int delta = result - lastStep;
         lastStep = result;
-        stepOutput += $"\"{line}\": {result} [{(delta > 0 ? "+" : "")}{delta}]";
+        WriteColor("\"", ConsoleColor.Gray);
+        WriteColor(line, ConsoleColor.White);
+        WriteColor("\": ", ConsoleColor.Gray);
+        WriteColor(result.ToString(), ConsoleColor.Cyan);
+        WriteColor(" [", ConsoleColor.Gray);
+        WriteColor((delta > 0 ? "+" : "") + delta.ToString(), delta >= 0 ? 
+            (delta == 0 ? ConsoleColor.White : ConsoleColor.Green) : ConsoleColor.Red);
+        WriteColor("]", ConsoleColor.Gray);
 
         foreach (Variable variable in variables)
         {
-            stepOutput += $" | {variable.name}: {variable.value}";
+            WriteColor(" | ", ConsoleColor.Gray);
+            WriteColor(variable.name, ConsoleColor.Magenta);
+            WriteColor(": ", ConsoleColor.Gray);
+            WriteColor(variable.value, ConsoleColor.Blue);
         }
 
-        stepOutput += "\n";
+        Console.WriteLine();
     }
 
+    private static int d4v2(string[] input)
+    {
+        int amount = 0;
+        foreach (string line in input)
+        {
+            string[] pairs = line.Split(',');
+            List<string[]> numbers = new List<string[]>();
 
+            foreach (string pair in pairs)
+            {
+                numbers.Add(pair.Split('-'));
+            }
+
+            if ((int.Parse(numbers[0][1]) >= int.Parse(numbers[1][0])) && (int.Parse(numbers[0][0]) <= int.Parse(numbers[1][1])))
+                amount++;
+
+            PrintStep(line, amount);
+        }
+        return amount;
+    }
+    private static int d4v1(string[] input)
+    {
+        int amount = 0;
+        foreach (string line in input)
+        {
+            string[] pairs = line.Split(',');
+            List<string[]> numbers = new List<string[]>();
+
+            foreach (string pair in pairs)
+            {
+                numbers.Add(pair.Split('-'));
+            }
+
+            if ((int.Parse(numbers[1][0]) >= int.Parse(numbers[0][0]) && int.Parse(numbers[1][1]) <= int.Parse(numbers[0][1])) ||
+                (int.Parse(numbers[0][0]) >= int.Parse(numbers[1][0]) && int.Parse(numbers[0][1]) <= int.Parse(numbers[1][1])))
+                amount++;
+
+            PrintStep(line, amount);
+        }
+        return amount;
+    }
     private static int d3v2(string[] input)
     {
         int total = 0;
