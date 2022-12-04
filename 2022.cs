@@ -33,6 +33,8 @@ class Program
                 }
                 while (arg.ToLower() != ">>");
 
+                Console.Clear();
+
                 args.RemoveAt(args.Count - 1);
             }
 
