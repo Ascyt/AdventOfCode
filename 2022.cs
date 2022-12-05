@@ -4,115 +4,6 @@
     const bool ASK_FOR_INPUT = false;
     static Method ToRun = d5v2;
 
-
-    delegate string Method(string[] input);
-
-    private static int lastStep;
-
-    [STAThread]
-    public static void Main()
-    {
-        string? output = null;
-
-        try
-        {
-            List<string> args = new List<string>();
-
-            if (ASK_FOR_INPUT)
-            {
-                Console.WriteLine("Paste in each lines, type in \">>\" to start code: ");
-
-                string arg;
-
-                do
-                {
-                    arg = Console.ReadLine();
-                    args.Add(arg);
-                }
-                while (arg.ToLower() != ">>");
-
-                Console.Clear();
-
-                args.RemoveAt(args.Count - 1);
-            }
-
-            string[] input = ASK_FOR_INPUT ? args.ToArray() : System.IO.File.ReadAllLines(INPUT_FILE);
-
-            output = ToRun(input);
-        }
-        catch (Exception ex)
-        {
-            WriteLineColor(ex.ToString(), ConsoleColor.Red);
-        }
-
-        WriteColor("\nResult: ", ConsoleColor.Black, ConsoleColor.White);
-
-        if (output != null)
-        {
-
-            WriteColor(output, ConsoleColor.Black, ConsoleColor.Yellow);
-            WriteLineColor("", ConsoleColor.White);
-
-            Clipboard.SetText(output);
-            Console.WriteLine("Result copied to clipboard.");
-        }
-    }
-
-    public static void WriteColor(string arg, ConsoleColor foregroundColor, ConsoleColor backgroundColor = ConsoleColor.Black)
-    {
-        Console.ForegroundColor = foregroundColor;
-        Console.BackgroundColor = backgroundColor;
-        Console.Write(arg);
-        Console.ResetColor();
-    }
-    public static void WriteLineColor(string arg, ConsoleColor foregroundColor, ConsoleColor backgroundColor = ConsoleColor.Black) =>
-        WriteColor(arg + '\n', foregroundColor, backgroundColor);
-
-    public struct Variable
-    {
-        public string name;
-        public string value;
-
-        public Variable(string name, string value)
-        {
-            this.name = name;
-            this.value = value;
-        }
-        public Variable(string name, int value)
-        {
-            this.name = name;
-            this.value = value.ToString();
-        }
-    }
-    private static Variable Var(string name, string value)
-        => new Variable(name, value);
-    private static Variable Var(string name, int value)
-        => new Variable(name, value);
-
-    public static void PrintStep(string line, int result, params Variable[] variables)
-    {
-        int delta = result - lastStep;
-        lastStep = result;
-        WriteColor("\"", ConsoleColor.Gray);
-        WriteColor(line, ConsoleColor.White);
-        WriteColor("\": ", ConsoleColor.Gray);
-        WriteColor(result.ToString(), ConsoleColor.Cyan);
-        WriteColor(" [", ConsoleColor.Gray);
-        WriteColor((delta > 0 ? "+" : "") + delta.ToString(), delta >= 0 ? 
-            (delta == 0 ? ConsoleColor.White : ConsoleColor.Green) : ConsoleColor.Red);
-        WriteColor("]", ConsoleColor.Gray);
-
-        foreach (Variable variable in variables)
-        {
-            WriteColor(" | ", ConsoleColor.Gray);
-            WriteColor(variable.name, ConsoleColor.Magenta);
-            WriteColor(": ", ConsoleColor.Gray);
-            WriteColor(variable.value, ConsoleColor.Blue);
-        }
-
-        Console.WriteLine();
-    }
-
     private static string d5v2(string[] input)
     {
         List<char>[] crates = new List<char>[(input[0].Length + 1) / 4];
@@ -441,5 +332,115 @@
         }
 
         return highest.ToString();
+    }
+
+
+
+    delegate string Method(string[] input);
+
+    private static int lastStep;
+
+    [STAThread]
+    public static void Main()
+    {
+        string? output = null;
+
+        try
+        {
+            List<string> args = new List<string>();
+
+            if (ASK_FOR_INPUT)
+            {
+                Console.WriteLine("Paste in each lines, type in \">>\" to start code: ");
+
+                string arg;
+
+                do
+                {
+                    arg = Console.ReadLine();
+                    args.Add(arg);
+                }
+                while (arg.ToLower() != ">>");
+
+                Console.Clear();
+
+                args.RemoveAt(args.Count - 1);
+            }
+
+            string[] input = ASK_FOR_INPUT ? args.ToArray() : System.IO.File.ReadAllLines(INPUT_FILE);
+
+            output = ToRun(input);
+        }
+        catch (Exception ex)
+        {
+            WriteLineColor(ex.ToString(), ConsoleColor.Red);
+        }
+
+        WriteColor("\nResult: ", ConsoleColor.Black, ConsoleColor.White);
+
+        if (output != null)
+        {
+
+            WriteColor(output, ConsoleColor.Black, ConsoleColor.Yellow);
+            WriteLineColor("", ConsoleColor.White);
+
+            Clipboard.SetText(output);
+            Console.WriteLine("Result copied to clipboard.");
+        }
+    }
+
+    public static void WriteColor(string arg, ConsoleColor foregroundColor, ConsoleColor backgroundColor = ConsoleColor.Black)
+    {
+        Console.ForegroundColor = foregroundColor;
+        Console.BackgroundColor = backgroundColor;
+        Console.Write(arg);
+        Console.ResetColor();
+    }
+    public static void WriteLineColor(string arg, ConsoleColor foregroundColor, ConsoleColor backgroundColor = ConsoleColor.Black) =>
+        WriteColor(arg + '\n', foregroundColor, backgroundColor);
+
+    public struct Variable
+    {
+        public string name;
+        public string value;
+
+        public Variable(string name, string value)
+        {
+            this.name = name;
+            this.value = value;
+        }
+        public Variable(string name, int value)
+        {
+            this.name = name;
+            this.value = value.ToString();
+        }
+    }
+    private static Variable Var(string name, string value)
+        => new Variable(name, value);
+    private static Variable Var(string name, int value)
+        => new Variable(name, value);
+
+    public static void PrintStep(string line, int result, params Variable[] variables)
+    {
+        int delta = result - lastStep;
+        lastStep = result;
+        WriteColor("\"", ConsoleColor.Gray);
+        WriteColor(line, ConsoleColor.White);
+        WriteColor("\": ", ConsoleColor.Gray);
+        WriteColor(result.ToString(), ConsoleColor.Cyan);
+        WriteColor(" [", ConsoleColor.Gray);
+        WriteColor((delta > 0 ? "+" : "") + delta.ToString(), delta >= 0 ?
+            (delta == 0 ? ConsoleColor.White : ConsoleColor.Green) : ConsoleColor.Red);
+        WriteColor("]", ConsoleColor.Gray);
+
+        foreach (Variable variable in variables)
+        {
+            WriteColor(" | ", ConsoleColor.Gray);
+            WriteColor(variable.name, ConsoleColor.Magenta);
+            WriteColor(": ", ConsoleColor.Gray);
+            WriteColor(variable.value, ConsoleColor.Blue);
+        }
+
+        Console.WriteLine();
     }
 }
