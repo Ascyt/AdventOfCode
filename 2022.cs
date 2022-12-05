@@ -1,20 +1,18 @@
-﻿using System.Windows.Forms;
-
-class Program
+﻿class Program
 {
-    const string INPUT_FILE = @"C:\Users\filip\Downloads\input";
+    const string INPUT_FILE = @"C:\Users\FamZauner\Downloads\input";
     const bool ASK_FOR_INPUT = false;
-    static Method ToRun = d4v2;
+    static Method ToRun = d5v2;
 
 
-    delegate int Method(string[] input);
+    delegate string Method(string[] input);
 
     private static int lastStep;
 
     [STAThread]
     public static void Main()
     {
-        int? output = null;
+        string? output = null;
 
         try
         {
@@ -49,13 +47,15 @@ class Program
 
         WriteColor("\nResult: ", ConsoleColor.Black, ConsoleColor.White);
 
-        string outputString = output == null ? "[no result]" : output.ToString();
+        if (output != null)
+        {
 
-        WriteColor(outputString, ConsoleColor.Black, ConsoleColor.Yellow);
-        WriteLineColor("", ConsoleColor.White);
+            WriteColor(output, ConsoleColor.Black, ConsoleColor.Yellow);
+            WriteLineColor("", ConsoleColor.White);
 
-        Clipboard.SetText(outputString);
-        Console.WriteLine("Result copied to clipboard.");
+            Clipboard.SetText(output);
+            Console.WriteLine("Result copied to clipboard.");
+        }
     }
 
     public static void WriteColor(string arg, ConsoleColor foregroundColor, ConsoleColor backgroundColor = ConsoleColor.Black)
@@ -113,7 +113,121 @@ class Program
         Console.WriteLine();
     }
 
-    private static int d4v2(string[] input)
+    private static string d5v2(string[] input)
+    {
+        List<char>[] crates = new List<char>[(input[0].Length + 1) / 4];
+        for (int i = 0; i < crates.Length; i++)
+        {
+            crates[i] = new List<char>();
+        }
+
+        bool cratesRead = false;
+        foreach (string line in input)
+        {
+            if (line == "")
+            {
+                cratesRead = true;
+                continue;
+            }
+
+            if (!cratesRead)
+            {
+                for (int i = 0; i < line.Length; i++)
+                {
+                    if (line[i] >= 'A' && line[i] <= 'Z')
+                    {
+                        crates[(i - 1) / 4].Add(line[i]);
+                        PrintStep(line, line[i], Var("index", (i - 1) / 4));
+                    }
+                }
+            }
+            else
+            {
+                string[] split = line.Split(' ');
+                int length = int.Parse(split[1]);
+                int from = int.Parse(split[3]) - 1;
+                int to = int.Parse(split[5]) - 1;
+                char[] toMove = new char[length];
+
+                for (int i = 0; i < length; i++)
+                {
+                    char c = crates[from][0];
+                    crates[from].RemoveAt(0);
+                    toMove[i] = c;
+                }
+                for (int i = length - 1; i >= 0; i--)
+                {
+                    crates[to].Insert(0, toMove[i]);
+                }
+
+                PrintStep(line, -1);
+            }
+        }
+
+        string output = "";
+        for (int i = 0; i < crates.Length; i++)
+        {
+            output += crates[i][0];
+        }
+
+        return output;
+    }
+
+    private static string d5v1(string[] input)
+    {
+        List<char>[] crates = new List<char>[(input[0].Length + 1) / 4];
+        for (int i = 0; i < crates.Length; i++)
+        {
+            crates[i] = new List<char>();
+        }
+
+        bool cratesRead = false;
+        foreach (string line in input)
+        {
+            if (line == "")
+            {
+                cratesRead = true;
+                continue;
+            }
+
+            if (!cratesRead)
+            {
+                for (int i = 0; i < line.Length; i++)
+                {
+                    if (line[i] >= 'A' && line[i] <= 'Z')
+                    {
+                        crates[(i - 1) / 4].Add(line[i]);
+                        PrintStep(line, line[i], Var("index", (i - 1) / 4));
+                    }
+                }
+            }
+            else
+            {
+                string[] split = line.Split(' ');
+                int length = int.Parse(split[1]);   
+                int from = int.Parse(split[3]) - 1;
+                int to = int.Parse(split[5]) - 1;   
+
+                for (int i = 0; i < length; i++)
+                {
+                    char c = crates[from][0];
+                    crates[from].RemoveAt(0);
+                    crates[to].Insert(0, c);
+                }
+                PrintStep(line, -1);
+            }
+        }
+
+        string output = "";
+        for (int i = 0; i < crates.Length; i++)
+        {
+            output += crates[i][0];
+        }
+
+        return output;
+    }
+
+    private static string d4v2(string[] input)
     {
         int amount = 0;
         foreach (string line in input)
@@ -131,9 +245,9 @@ class Program
 
             PrintStep(line, amount);
         }
-        return amount;
+        return amount.ToString();
     }
-    private static int d4v1(string[] input)
+    private static string d4v1(string[] input)
     {
         int amount = 0;
         foreach (string line in input)
@@ -152,9 +266,9 @@ class Program
 
             PrintStep(line, amount);
         }
-        return amount;
+        return amount.ToString();
     }
-    private static int d3v2(string[] input)
+    private static string d3v2(string[] input)
     {
         int total = 0;
 
@@ -184,7 +298,7 @@ class Program
 
         CheckCommons();
 
-        return total;
+        return total.ToString();
 
         void CheckCommons()
         {
@@ -196,7 +310,7 @@ class Program
             commonItems = null;
         }
     }
-    private static int d3v1(string[] input)
+    private static string d3v1(string[] input)
     {
         int total = 0;
 
@@ -217,9 +331,9 @@ class Program
             }
         }
 
-        return total;
+        return total.ToString();
     }
-    private static int d2v2(string[] input)
+    private static string d2v2(string[] input)
     {
         int total = 0;
         foreach (string line in input)
@@ -233,10 +347,10 @@ class Program
 
             PrintStep(line, total, Var(nameof(opponent), opponent), Var(nameof(player), player));
         }
-        return total;
+        return total.ToString();
     }
 
-    private static int d2v1(string[] input)
+    private static string d2v1(string[] input)
     {
         int total = 0;
         foreach (string line in input)
@@ -250,10 +364,10 @@ class Program
 
             PrintStep(line, total, Var(nameof(opponent), opponent), Var(nameof(player), player));
         }
-        return total;
+        return total.ToString();
     }
 
-    private static int d1v2(string[] input)
+    private static string d1v2(string[] input)
     {
         List<int> list = new List<int>();
 
@@ -295,10 +409,10 @@ class Program
             total += i;
         }
 
-        return total;
+        return total.ToString();
     }
 
-    private static int d1v1(string[] input)
+    private static string d1v1(string[] input)
     {
         List<int> list = new List<int>();
         
@@ -326,6 +440,6 @@ class Program
             }
         }
 
-        return highest;
+        return highest.ToString();
     }
 }
