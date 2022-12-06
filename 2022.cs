@@ -2,9 +2,63 @@
 {
     const string INPUT_FILE = @"C:\Users\FamZauner\Downloads\input";
     const bool ASK_FOR_INPUT = false;
-    static Method ToRun = d5v2;
+    static Method ToRun = d6v1;
 
-    private static string d5v2(string[] input)
+    private static string? d6v2(string[] input)
+    {
+        return d6(input, 14);
+    }
+
+    private static string? d6v1(string[] input)
+    {
+        return d6(input, 4);
+    }
+    private static string? d6(string[] input, int length)
+    {
+        List<char> lastChars = new List<char>();
+
+        for (int i = 0; i < input[0].Length; i++)
+        {
+            lastChars.Add(input[0][i]);
+
+            bool noneRepeat = lastChars.Count == length;
+            if (noneRepeat)
+            {
+                for (int ii = 0; ii < lastChars.Count; ii++)
+                {
+                    bool contains = false;
+                    for (int iii = 0; iii < lastChars.Count; iii++)
+                    {
+                        if (ii != iii && lastChars[ii] == lastChars[iii])
+                        {
+                            PrintStep(input[0][i].ToString(), ii, Var("iii", iii), Var("lastChars.Count", lastChars.Count));
+                            contains = true;
+                            break;
+                        }
+                    }
+                    if (contains)
+                    {
+                        noneRepeat = false;
+                        break;
+                    }
+                }
+            }
+
+            if (noneRepeat)
+            {
+                return (i+1).ToString();
+            }
+
+            if (lastChars.Count == length)
+            {
+                lastChars.RemoveAt(0);
+            }
+        }
+
+        return null;
+    }
+
+    private static string? d5v2(string[] input)
     {
         List<char>[] crates = new List<char>[(input[0].Length + 1) / 4];
         for (int i = 0; i < crates.Length; i++)
@@ -64,7 +118,7 @@
         return output;
     }
 
-    private static string d5v1(string[] input)
+    private static string? d5v1(string[] input)
     {
         List<char>[] crates = new List<char>[(input[0].Length + 1) / 4];
         for (int i = 0; i < crates.Length; i++)
@@ -118,7 +172,7 @@
         return output;
     }
 
-    private static string d4v2(string[] input)
+    private static string? d4v2(string[] input)
     {
         int amount = 0;
         foreach (string line in input)
@@ -138,7 +192,7 @@
         }
         return amount.ToString();
     }
-    private static string d4v1(string[] input)
+    private static string? d4v1(string[] input)
     {
         int amount = 0;
         foreach (string line in input)
@@ -159,7 +213,7 @@
         }
         return amount.ToString();
     }
-    private static string d3v2(string[] input)
+    private static string? d3v2(string[] input)
     {
         int total = 0;
 
@@ -201,7 +255,7 @@
             commonItems = null;
         }
     }
-    private static string d3v1(string[] input)
+    private static string? d3v1(string[] input)
     {
         int total = 0;
 
@@ -224,7 +278,7 @@
 
         return total.ToString();
     }
-    private static string d2v2(string[] input)
+    private static string? d2v2(string[] input)
     {
         int total = 0;
         foreach (string line in input)
@@ -241,7 +295,7 @@
         return total.ToString();
     }
 
-    private static string d2v1(string[] input)
+    private static string? d2v1(string[] input)
     {
         int total = 0;
         foreach (string line in input)
@@ -258,7 +312,7 @@
         return total.ToString();
     }
 
-    private static string d1v2(string[] input)
+    private static string? d1v2(string[] input)
     {
         List<int> list = new List<int>();
 
@@ -303,7 +357,7 @@
         return total.ToString();
     }
 
-    private static string d1v1(string[] input)
+    private static string? d1v1(string[] input)
     {
         List<int> list = new List<int>();
         
@@ -336,7 +390,7 @@
 
 
 
-    delegate string Method(string[] input);
+    delegate string? Method(string[] input);
 
     private static int lastStep;
 
@@ -377,13 +431,14 @@
         }
 
         WriteColor("\nResult: ", ConsoleColor.Black, ConsoleColor.White);
+        if (output != null)
+            WriteColor(output, ConsoleColor.Black, ConsoleColor.Yellow);
+        else
+            WriteColor("null", ConsoleColor.Black, ConsoleColor.Red);
+        WriteLineColor("", ConsoleColor.White);
 
         if (output != null)
         {
-
-            WriteColor(output, ConsoleColor.Black, ConsoleColor.Yellow);
-            WriteLineColor("", ConsoleColor.White);
-
             Clipboard.SetText(output);
             Console.WriteLine("Result copied to clipboard.");
         }
