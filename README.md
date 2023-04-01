@@ -1,0 +1,1 @@
+Set "INPUT_FILE" to your input file, or set "ASK_FOR_INPUT" to true and you can paste the input in instead. Set "ToRun" to the method that you want to run, with the format "d{day 1-25}v{version 1/2}".
